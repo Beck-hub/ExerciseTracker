@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="style.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <header>
+        <h2>Your Exercise Tracker!</h2>
+    </header>
+        <div class="forms">
+          <form action="/api/exercise/new-user" method="POST" class="username-form" >
+            <label>Create a New User </label>
+            <p class="username-desc">(must contain 6+ characters: 1 number, 1 uppercase & 1 lowercase letter)</p>
+            <code>POST /api/exercise/new-user</code>
+            <input id="username" name="username"  type="text" placeholder="Beckydean28" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}" required/>
+            <button type="submit">Add User Name</button>
+          </form>
+          <form action="/api/exercise/add" method="POST" class="add-form">
+            <label>Add exercises</label>
+            <code>POST /api/exercise/add</code>
+            <input id="userId" name="userId" type="text" placeholder="userId**" pattern="[a-z0-9]+" required/>
+            <input id="description" name="description" type="text" placeholder="description* (max 20 charac)" pattern="[A-Za-z\s]{1,20}"  required/>
+            <input id="duration" name="duration" type="number" placeholder="duration (mins)*" min="1" max="500" required/>
+            <input id="date" type="date" name="date" placeholder="date (yyyy-mm-dd)+" min="1920-01-01" max="<%=currentDate%>"/>
+            <button type="submit">Add Exercises</button>
+          </form>
+        </div>
+    <div class="extra-desc">
+      <p class="desc"> <span>**required</span>  & takes the form: <span>5f24366a81f...</span><br> <span>*required</span> <br> <span>+</span>if not answered, will default to today's date</p>
+      <p class="desc">GET exercise log(s):</p> <code>GET /api/exercise/log?{userId}[&from][&to][&limit]</code>
+      <p class="desc">{is required} [is optional]</p>
+    </div>
+    <footer>2020 FCC Backend Project #4 <br> Made with: Node.js, Express, ejs, CSS, Mongoose, MongoDB</footer> 
+</body>
+</html>
