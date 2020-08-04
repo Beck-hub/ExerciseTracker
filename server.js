@@ -5,8 +5,7 @@ const cors = require("cors");
 app.use(bodyParser.json());
 app.use(cors());
 app.use(express.urlencoded({extended: false})); 
-
-app.use(bodyParser.urlencoded({extended:true})); // middleware for parsing bodies from URL
+// middleware for parsing bodies from URL
 // Returns middleware that only parses {urlencoded} bodies and only looks at requests 
 // where the Content-Type header matches the type option. 
 // This parser accepts only UTF-8 encoding of the body and supports automatic inflation of gzip and deflate encodings.
@@ -24,7 +23,7 @@ const MONGO_URI = process.env.MONGOOSE_URI || "mongodb://localhost/tracker"
 mongoose
      .connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true  })
      .then(() => console.log( 'Database Connected' ))
-     .catch(err => res.json({error: err.name, message: err.message, stack: err.stack}));
+     .catch(err =>({error: err.name, message: err.message, stack: err.stack}));
 
 app.get("/",  (req,res)=> {
   let dateObj = new Date();
@@ -42,7 +41,7 @@ app.post('/api/exercise/new-user', async (req, res) => {
     } else {
         let newUser = await new User({username});
         newUser.save();
-        res.json(newUser);
+        res.json({username: newUser.username, _id: newUser._id});
   }
 } catch (err) {
   res.json({error: err.name, message: err.message, stack: err.stack})
@@ -53,6 +52,7 @@ app.post('/api/exercise/new-user', async (req, res) => {
 app.get("/api/exercise/users", async (req,res) => {
     try {
       let allUsers = await User.find();
+      console.log(allUsers);
       res.json(allUsers);
     } catch (err) {
       res.json({error: err.name, message: err.message, stack: err.stack})
@@ -62,7 +62,6 @@ app.get("/api/exercise/users", async (req,res) => {
  // Adds a new exercise w/ duration & date for a givn userId to the db
   app.post("/api/exercise/add", async (req,res) => {
     const {userId, description, duration} = req.body;
-    let name, log, result, myAnswer;
     // Make sure the date is formatted correctly & is a date that can be used: 
     const date = (req.body.date == "") ? new Date().toDateString() : new Date(req.body.date).toDateString() == "Invalid Date"?  new Date().toDateString() : new Date(req.body.date).toDateString();
     try {
@@ -99,7 +98,9 @@ app.get("/api/exercise/users", async (req,res) => {
   
   // Return different info about the users & their exercise logs depending on the parameters used in the url
   app.get("/api/exercise/log",  async (req,res) => {
-    const {id, from, to,limit} = req.query;
+    const {userId, from, to,limit} = req.query;
+    let name, log, result, myAnswer;
+
     // queries in url: ?param1=value&param2=value2
     // $gte: selects the documents where the value of the field is greater than or equal to a value  {field: {$gte: value} }
     // $lte: selects the documents where the value of the field is less than or equal to a value  {field: {$gte: value} }
@@ -111,7 +112,7 @@ app.get("/api/exercise/users", async (req,res) => {
        }
       else {
         let userLog =  await new Promise((resolve, reject) => {
-           ExerciseLogs.find({userId: id, date: {$lte: new Date(to) != 'Invalid Date' ? new Date(to).toISOString() : Date.now()   , $gte: new Date(from) != 'Invalid Date' ? new Date(from).toISOString() : 0}}).limit(limit ==undefined? 1000: parseInt(limit))
+           ExerciseLogs.find({userId: userId, date: {$lte: new Date(to) != 'Invalid Date' ? new Date(to).toISOString() : Date.now()   , $gte: new Date(from) != 'Invalid Date' ? new Date(from).toISOString() : 0}}).limit(limit ==undefined? 1000: parseInt(limit))
             .then(list => { // 
               resolve(list);
             })
@@ -122,7 +123,7 @@ app.get("/api/exercise/users", async (req,res) => {
       log=res;
     });
     let usersname =  await new Promise((resolve, reject) => {
-      User.find({_id: id})
+      User.find({_id: userId})
         .then(list => {
            resolve(list[0].username);
         })
@@ -138,7 +139,7 @@ app.get("/api/exercise/users", async (req,res) => {
 });
   
    
-  myAnswer ={id: id, username: name, count: log.length, log: result}
+  myAnswer ={id: userId, username: name, count: log.length, log: result}
     res.json(myAnswer);
  } // end else statement 
 } catch(err) {
