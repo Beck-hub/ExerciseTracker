@@ -19,7 +19,7 @@ const mongodb = require("mongodb");
 const User = require("./models/userSchema");
 const ExerciseLogs = require("./models/exerciseSchema");
 
-const MONGO_URI = process.env.MONGOOSE_URI || "mongodb://localhost/tracker"
+const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost/tracker"
 mongoose
      .connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true  })
      .then(() => console.log( 'Database Connected' ))
@@ -147,8 +147,8 @@ app.get("/api/exercise/users", async (req,res) => {
     }
 }); // end
 
-const PORT = 3000 || process.env.PORT;
-app.listen(PORT, () => {
+const PORT = 80 || process.env.PORT;
+app.listen(80 || process.env.PORT, () => {
    console.log(`App is listening ${PORT}.`);
 });
 
