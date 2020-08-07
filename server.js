@@ -1,4 +1,4 @@
-// I have tried to pass the tests multiple times, and it always says: Test timed out
+require('dotenv').config();
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
